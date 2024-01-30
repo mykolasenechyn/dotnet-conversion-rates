@@ -4,10 +4,10 @@ namespace ConversionRates.Controllers
 {
 
   [ApiController]
-  [Route("api/rates")]
-  public class ConversationRatesController : ControllerBase
+  [Route("api")]
+  public class ConversionRatesController : ControllerBase
   {
-    [HttpGet("api/rates")]
+    [HttpGet("rates")]
     public JsonResult GetRates()
     {
       return new JsonResult(
