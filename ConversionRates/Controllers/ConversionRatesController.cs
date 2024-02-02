@@ -1,3 +1,4 @@
+using ConversionRates.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ConversionRates.Controllers
@@ -8,12 +9,23 @@ namespace ConversionRates.Controllers
   public class ConversionRatesController : ControllerBase
   {
     [HttpGet("rates")]
-    public JsonResult GetRates()
+    public async Task<ActionResult<IEnumerable<ConversionRate>>?> GetRates()
     {
-      return new JsonResult(
-        new List<object>{
-          new { id = 1, Currency = "GB" }
-        });
+      const string url = "https://trainlinerecruitment.github.io/exchangerates/api/latest/GBP.json";
+
+      using var dataFetcher = new HttpDataFetcher();
+      var responseData = await dataFetcher.FetchDataAsync(url);
+
+      if (responseData != null)
+      {
+        Console.WriteLine($"Fetched data: {responseData}");
+        return Ok(responseData);
+      }
+      else
+      {
+        Console.WriteLine("Failed to fetch data.");
+        return null;
+      }
     }
   }
 }
