@@ -6,7 +6,7 @@ namespace ConversionRates.Controllers
 {
 
   [ApiController]
-  [Route("api")]
+  [Route("api/pricing")]
   public class ConversionRatesController : ControllerBase
   {
     private readonly IConversionDataService _conversionService;
@@ -16,11 +16,28 @@ namespace ConversionRates.Controllers
       _conversionService = conversionService;
     }
 
-    [HttpGet("rates")]
-    public async Task<IActionResult> GetRates()
+    [HttpGet("convert/{gbp}")]
+    public async Task<IActionResult> ConvertRate(string gbp)
     {
       var data = await _conversionService.GetConversionData();
-      return Ok(data);
+
+      if (data == null)
+      {
+        return NoContent();
+      }
+
+
+      if (decimal.TryParse(gbp, out decimal user_amount))
+      {
+        if (data.Rates.TryGetValue("EUR", out decimal euro_rate))
+        {
+          decimal conversion = user_amount * euro_rate;
+
+          return Ok(conversion);
+        }
+      }
+
+      return NoContent();
     }
   }
 }
