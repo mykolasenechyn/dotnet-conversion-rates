@@ -1,4 +1,5 @@
 using ConversionRates.Models;
+using ConversionRates.Services.ConversionData;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ConversionRates.Controllers
@@ -8,24 +9,18 @@ namespace ConversionRates.Controllers
   [Route("api")]
   public class ConversionRatesController : ControllerBase
   {
-    [HttpGet("rates")]
-    public async Task<ActionResult<IEnumerable<ConversionRate>>?> GetRates()
+    private readonly IConversionDataService _conversionService;
+
+    public ConversionRatesController(IConversionDataService conversionService)
     {
-      const string url = "https://trainlinerecruitment.github.io/exchangerates/api/latest/GBP.json";
+      _conversionService = conversionService;
+    }
 
-      using var dataFetcher = new HttpDataFetcher();
-      var responseData = await dataFetcher.FetchDataAsync(url);
-
-      if (responseData != null)
-      {
-        Console.WriteLine($"Fetched data: {responseData}");
-        return Ok(responseData);
-      }
-      else
-      {
-        Console.WriteLine("Failed to fetch data.");
-        return null;
-      }
+    [HttpGet("rates")]
+    public async Task<IActionResult> GetRates()
+    {
+      var data = await _conversionService.GetConversionData();
+      return Ok(data);
     }
   }
 }
